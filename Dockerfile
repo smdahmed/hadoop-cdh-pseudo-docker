@@ -1,5 +1,8 @@
 FROM nimmis/java:oracle-8-jdk
-MAINTAINER Martin Chalupa <chalimartines@gmail.com>
+MAINTAINER Kabeer Ahmed <smdahmed@gmail.com>
+
+# CREDIT: This work is completely based out of work @
+# https://github.com/chali/hadoop-cdh-pseudo-docker 
 
 #Base image doesn't start in root
 WORKDIR /
@@ -12,8 +15,10 @@ COPY conf/cloudera.pref /etc/apt/preferences.d/cloudera.pref
 COPY conf/python.list /etc/apt/sources.list.d/python.list
 
 #Add a Repository Key
-RUN wget http://archive.cloudera.com/cdh5/ubuntu/trusty/amd64/cdh/archive.key -O archive.key && sudo apt-key add archive.key && \
+RUN wget http://archive.cloudera.com/cdh5/ubuntu/trusty/amd64/cdh/archive.key -O archive.key && \
+    sudo apt-key add archive.key && \
     sudo apt-get update
+
 
 #Install CDH package and dependencies
 RUN sudo apt-get install -y zookeeper-server && \
@@ -34,6 +39,39 @@ COPY conf/fair-scheduler.xml /etc/hadoop/conf/fair-scheduler.xml
 COPY conf/oozie-site.xml /etc/oozie/conf/oozie-site.xml
 COPY conf/spark-defaults.conf /etc/spark/conf/spark-defaults.conf
 COPY conf/hue.ini /etc/hue/conf/hue.ini
+
+##### CHANGES BY KABEER AHMED #####
+
+# Hardcoding addition of a repository key that is causing issues for Old Python Versions.
+# Not sure I need it but doing it anyways.
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 5BB92C09DB82666C
+
+# Install the apt https transport support
+RUN sudo apt-get install -y apt-transport-https
+
+# Install the git client
+RUN sudo apt-get install -y git
+
+# Leinengen Script
+COPY conf/lein.sh /usr/bin/lein
+RUN chmod a+x /usr/bin/lein
+
+# Install Scala - I know, you need 2 functional programming languages (GREEDY!)
+RUN sudo apt-get install -y scala
+
+# Install SBT
+RUN echo "deb https://dl.bintray.com/sbt/debian /" | sudo tee -a /etc/apt/sources.list.d/sbt.list && \
+    sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 642AC823 && \
+    sudo apt-get update && \
+    sudo apt-get install -y sbt
+
+# Install SSH client for git clone
+RUN sudo apt-get install -y openssh-client
+
+# Set term
+RUN export TERM=xterm
+
+########### CHANGES END BY KABEER AHMED ######
 
 #Format HDFS
 RUN sudo -u hdfs hdfs namenode -format
