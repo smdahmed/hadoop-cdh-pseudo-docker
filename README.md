@@ -76,3 +76,9 @@ sudo docker rm b5cc1b8601ff
 ```
 
 Find out which image with `docker ps -a`. Onced removed your can re-run the docker image (see above `Run the docker image built`)
+
+#### How to remove the Docker image so it can be re-built
+
+```
+sudo docker rmi hadoop-cdh-pseudo-docker
+```
