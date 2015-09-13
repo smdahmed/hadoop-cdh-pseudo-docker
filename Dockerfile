@@ -44,7 +44,7 @@ COPY conf/hue.ini /etc/hue/conf/hue.ini
 
 # Hardcoding addition of a repository key that is causing issues for Old Python Versions.
 # Not sure I need it but doing it anyways.
-apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 5BB92C09DB82666C
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 5BB92C09DB82666C
 
 # Install the apt https transport support
 RUN sudo apt-get install -y apt-transport-https
